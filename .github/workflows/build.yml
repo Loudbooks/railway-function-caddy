@@ -36,10 +36,10 @@ jobs:
       - name: Cache Docker layers
         uses: actions/cache@v3
         with:
-          path: /tmp/.buildx-cache-railway-function-shell-${{ matrix.arch }}
-          key: ${{ runner.os }}-railway-function-shell-buildx-${{ matrix.arch }}-${{ github.sha }}
+          path: /tmp/.buildx-cache-railway-function-caddy-${{ matrix.arch }}
+          key: ${{ runner.os }}-railway-function-caddy-buildx-${{ matrix.arch }}-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-railway-function-shell-buildx-${{ matrix.arch }}-
+            ${{ runner.os }}-railway-function-caddy-buildx-${{ matrix.arch }}-
 
       - name: Build Docker image
         uses: docker/build-push-action@v3
@@ -49,15 +49,15 @@ jobs:
             COMMIT_HASH=${{ env.hash }}
           push: true
           platforms: linux/${{ matrix.arch }}
-          cache-from: type=local,src=/tmp/.buildx-cache-railway-function-shell-${{ matrix.arch }}
-          cache-to: type=local,dest=/tmp/.buildx-cache-railway-function-shell-${{ matrix.arch }}-new,mode=max
+          cache-from: type=local,src=/tmp/.buildx-cache-railway-function-caddy-${{ matrix.arch }}
+          cache-to: type=local,dest=/tmp/.buildx-cache-railway-function-caddy-${{ matrix.arch }}-new,mode=max
           tags: |
-            ghcr.io/loudbooks/railway-function-shell:${{ env.hash }}-${{ matrix.arch }}
+            ghcr.io/loudbooks/railway-function-caddy:${{ env.hash }}-${{ matrix.arch }}
 
       - name: Move updated Docker cache
         run: |
-          rm -rf /tmp/.buildx-cache-railway-function-shell-${{ matrix.arch }}
-          mv /tmp/.buildx-cache-railway-function-shell-${{ matrix.arch }}-new /tmp/.buildx-cache-railway-function-shell-${{ matrix.arch }}
+          rm -rf /tmp/.buildx-cache-railway-function-caddy-${{ matrix.arch }}
+          mv /tmp/.buildx-cache-railway-function-caddy-${{ matrix.arch }}-new /tmp/.buildx-cache-railway-function-caddy-${{ matrix.arch }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -79,6 +79,6 @@ jobs:
       - name: Create and push multi-arch manifest
         run: |
           docker buildx imagetools create \
-            -t ghcr.io/loudbooks/railway-function-shell:latest \
-            ghcr.io/loudbooks/railway-function-shell:${{ needs.build.outputs.commit_hash }}-amd64 \
-            ghcr.io/loudbooks/railway-function-shell:${{ needs.build.outputs.commit_hash }}-arm64
+            -t ghcr.io/loudbooks/railway-function-caddy:latest \
+            ghcr.io/loudbooks/railway-function-caddy:${{ needs.build.outputs.commit_hash }}-amd64 \
+            ghcr.io/loudbooks/railway-function-caddy:${{ needs.build.outputs.commit_hash }}-arm64
